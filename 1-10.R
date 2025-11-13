@@ -9,8 +9,7 @@ library(R6)
 
 Solution <- R6Class("Solution",
   public = list(
-    twoSum = function(nums, target) 
-    {
+    twoSum = function(nums, target) {
       n <- length(nums)
       for (i in 1:(n-1)){
         for (j in (i+1):n) {
@@ -199,3 +198,137 @@ result <- s$findMedianSortedArrays(c(1, 2), c(3, 4))
 
 result
 
+# Longest Palindromic Substring
+
+# Given a string s, return the longest palindromic substring in s.
+
+Solution <- R6Class("Solution",
+  public = list(
+    longestPalindrome = function(s) {
+        max_palindrome <- substring(s, 1, 1)
+        for (i in 1:nchar(s)){
+            substring <- substring(s, i, i)
+            m <- i # start of the palindrome
+            n <- i # end of the palindrome
+
+            # starting palindrome
+            while (n+1 <= nchar(s) - 1 && substring(s, n+1, n+1) == substring){
+                substring <- paste0(substring, substring(s, n+1, n+1))
+                n <- n + 1
+            }
+
+            # expanding palindrome
+            while ((n+1 <= nchar(s)) && (m-1 >= 0) && (substring(s, m-1, m-1) == substring(s, n+1, n+1))){
+                substring <- paste0(substring(s, m-1, m-1), substring, substring(s, n+1, n+1))
+                m <- m - 1
+                n <- n + 1
+            }
+
+            if (nchar(substring) > nchar(max_palindrome)){
+                max_palindrome <- substring
+            }
+        }
+        return(max_palindrome)
+    }
+  )
+)
+
+s <- Solution$new()
+result <- s$longestPalindrome("adsedcbbdexd")
+result
+
+# Zigzag Conversion
+
+# The string "PAYPALISHIRING" is written in a zigzag pattern on a given number of rows like this: (you may want to display this pattern in a fixed font for better legibility)
+# P   A   H   N
+# A P L S I I G
+# Y   I   R
+# And then read line by line: "PAHNAPLSIIGYIR"
+# Write the code that will take a string and make this conversion given a number of rows:
+# string convert(string s, int numRows);
+
+Solution <- R6Class("Solution",
+  public = list(
+    convert = function(s, numRows) {
+        step1 <- max(2 * numRows - 2, 1)
+        print(paste("step1:", step1))
+        result <- ""
+
+        n <- nchar(s)
+
+        for (i in (0:(numRows-1))) {
+          print(paste("i:", i))
+
+          # first and last rows
+          if ((i == 0) || (i == numRows - 1)) {
+            # substring <- s[seq(i + 1, nchar(s), by = step1)]
+            indices <- seq(from = i + 1, to = n, by = step1)
+            print("indices:")
+            print(indices)
+
+            chars <- substring(s, indices, indices)
+            print("chars:")
+            print(chars)
+
+            substring_val <- paste(chars, collapse = "")
+          } else {
+            # middle rows
+            idx_ver <- seq(from=i, to=n-1, by = step1)
+            idx_dia <- seq(from=step1 - i, to=n-1, by = step1)
+            all_indices <- c(idx_ver, idx_dia)
+
+            sorted_indices <- sort(unique(all_indices)) + 1
+
+            chars <- substring(s, sorted_indices, sorted_indices)
+            substring_val <- paste(chars, collapse = "")
+            print(paste("substring_val:", substring_val))
+          }
+
+          result <- paste0(result, substring_val)
+          print(paste("result so far:", result))
+        }
+        return(result)
+    }
+  )
+)
+
+s <- Solution$new()
+result <- s$convert("PAYPALISHIRING", 3)
+result
+
+
+# Reverse Integer
+
+# Given a signed 32-bit integer x, return x with its digits reversed. If reversing x causes the value to go outside the signed 32-bit integer range [-231, 231 - 1], then return 0.
+# Assume the environment does not allow you to store 64-bit integers (signed or unsigned).
+
+Solution <- R6Class("Solution",
+  public = list(
+    reverse = function(x) {
+      x_str <- as.character(x)
+
+      if (substr(x_str, 1,1) == "-") {
+        num_part <- substr(x_str, 2, nchar(x_str))
+        chars <- strsplit(num_part, split = "")[[1]]
+        reversed_part <- paste(rev(chars), collapse = "")
+
+        x_rev <- as.numeric(paste0("-", reversed_part))
+      } else {
+        chars <- strsplit(x_str, split = "")[[1]]
+        reversed_str <- paste(rev(chars), collapse = "")
+
+        x_rev <- as.numeric(reversed_str)
+      }
+      if (x_rev < -2^31 || x_rev > 2^31 - 1) {
+        return(0)
+      } else {
+        return(x_rev)
+      }
+    }
+  )
+)
+
+s <- Solution$new()
+result <- s$reverse(123)
+
+result
